@@ -1,0 +1,268 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 2em;
+}
+
+.stats {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+}
+
+.btn-success {
+    background: #48bb78;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #38a169;
+}
+
+.btn-danger {
+    background: #f56565;
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.btn-danger:hover {
+    background: #e53e3e;
+}
+
+input[type="text"],
+input[type="number"] {
+    padding: 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    flex: 1;
+    min-width: 200px;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 300px;
+}
+
+.add-word-section {
+    background: #f7fafc;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.table-container {
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    background: #4a5568;
+    color: white;
+    z-index: 10;
+}
+
+th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+tr:hover {
+    background: #f7fafc;
+}
+
+.word-cell {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.score-input {
+    width: 80px;
+    padding: 5px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.score-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.actions {
+    display: flex;
+    gap: 5px;
+}
+
+.file-info {
+    background: #edf2f7;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+    color: #4a5568;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.no-results {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+.sort-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0 5px;
+    font-size: 0.8em;
+}
+
+.sort-btn:hover {
+    color: #cbd5e0;
+}
+
+.pagination {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f7fafc;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.pagination-info {
+    text-align: center;
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.page-indicator {
+    padding: 0 15px;
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.pagination-settings {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination-settings label {
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.pagination-settings select {
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    background: white;
+}
+
+.pagination-settings select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+    background: #667eea;
+}
