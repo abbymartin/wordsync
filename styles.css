@@ -99,6 +99,40 @@ input[type="number"]:focus {
     min-width: 300px;
 }
 
+.filter-section {
+    background: #edf2f7;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #4a5568;
+    white-space: nowrap;
+}
+
+.filter-group input[type="number"] {
+    width: 80px;
+    min-width: 80px;
+    padding: 8px;
+}
+
+.filter-separator {
+    color: #4a5568;
+    font-weight: 500;
+}
+
 .add-word-section {
     background: #f7fafc;
     padding: 15px;

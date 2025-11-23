@@ -33,7 +33,13 @@ const elements = {
     prevPageBtn: document.getElementById('prevPageBtn'),
     nextPageBtn: document.getElementById('nextPageBtn'),
     lastPageBtn: document.getElementById('lastPageBtn'),
-    itemsPerPageSelect: document.getElementById('itemsPerPage')
+    itemsPerPageSelect: document.getElementById('itemsPerPage'),
+    filterSection: document.getElementById('filterSection'),
+    minLength: document.getElementById('minLength'),
+    maxLength: document.getElementById('maxLength'),
+    minScore: document.getElementById('minScore'),
+    maxScore: document.getElementById('maxScore'),
+    clearFiltersBtn: document.getElementById('clearFiltersBtn')
 };
 
 function loadFile() {
@@ -97,6 +103,16 @@ function enableControls() {
     elements.newWord.disabled = false;
     elements.newScore.disabled = false;
     elements.addBtn.disabled = false;
+    elements.filterSection.style.display = 'flex';
+}
+
+function clearFilters() {
+    elements.searchBox.value = '';
+    elements.minLength.value = '';
+    elements.maxLength.value = '';
+    elements.minScore.value = '';
+    elements.maxScore.value = '';
+    applyFilter();
 }
 
 function markChanged() {
@@ -154,11 +170,21 @@ function updateScore(word, newScore) {
 
 function applyFilter() {
     const searchTerm = elements.searchBox.value.toUpperCase();
-    isSearchActive = searchTerm.length > 0;
+    const minLen = parseInt(elements.minLength.value) || 0;
+    const maxLen = parseInt(elements.maxLength.value) || Infinity;
+    const minScr = parseInt(elements.minScore.value) || 0;
+    const maxScr = parseInt(elements.maxScore.value) || 100;
 
-    filteredWordlist = wordlist.filter(item =>
-        item.word.includes(searchTerm)
-    );
+    isSearchActive = searchTerm.length > 0 || minLen > 0 || maxLen < Infinity ||
+                     minScr > 0 || maxScr < 100;
+
+    filteredWordlist = wordlist.filter(item => {
+        const matchesSearch = item.word.includes(searchTerm);
+        const matchesLength = item.word.length >= minLen && item.word.length <= maxLen;
+        const matchesScore = item.score >= minScr && item.score <= maxScr;
+
+        return matchesSearch && matchesLength && matchesScore;
+    });
 
     currentPage = 1;
     renderTable();
@@ -283,6 +309,12 @@ elements.loadBtn.addEventListener('click', loadFile);
 elements.saveBtn.addEventListener('click', saveFile);
 elements.addBtn.addEventListener('click', addWord);
 elements.searchBox.addEventListener('input', debouncedSearch);
+
+elements.minLength.addEventListener('input', debouncedSearch);
+elements.maxLength.addEventListener('input', debouncedSearch);
+elements.minScore.addEventListener('input', debouncedSearch);
+elements.maxScore.addEventListener('input', debouncedSearch);
+elements.clearFiltersBtn.addEventListener('click', clearFilters);
 
 elements.newWord.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') addWord();
