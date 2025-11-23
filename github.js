@@ -1,0 +1,195 @@
+const DEFAULT_BRANCH = 'main';
+
+class GitHubAPI {
+    constructor(token, repoOwner, repoName, branch = DEFAULT_BRANCH) {
+        this.token = token;
+        this.repoOwner = repoOwner;
+        this.repoName = repoName;
+        this.branch = branch;
+        this.baseUrl = 'https://api.github.com';
+    }
+
+    async request(url, options = {}) {
+        const headers = {
+            'Authorization': `token ${this.token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            ...options.headers
+        };
+
+        const response = await fetch(url, {
+            ...options,
+            headers
+        });
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.message || `GitHub API error: ${response.status}`);
+        }
+
+        return response.json();
+    }
+
+    async validateToken() {
+        try {
+            await this.request(`${this.baseUrl}/user`);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async loadFromGitHub(filePath) {
+        try {
+            const refData = await this.request(
+                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/ref/heads/${this.branch}`
+            );
+            const commitSha = refData.object.sha;
+
+            const commitData = await this.request(
+                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/commits/${commitSha}`
+            );
+            const treeSha = commitData.tree.sha;
+
+            const treeData = await this.request(
+                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/trees/${treeSha}`
+            );
+
+            const fileEntry = treeData.tree.find(entry => entry.path === filePath);
+            if (!fileEntry) {
+                throw new Error(`File "${filePath}" not found in repository`);
+            }
+
+            const blobData = await this.request(
+                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/blobs/${fileEntry.sha}`
+            );
+
+            const content = atob(blobData.content);
+
+            return {
+                content,
+                sha: commitSha,
+                blobSha: fileEntry.sha
+            };
+        } catch (error) {
+            throw new Error(`Failed to load from GitHub: ${error.message}`);
+        }
+    }
+
+    async saveToGitHub(filePath, content, commitMessage) {
+        try {
+            const refData = await this.request(
+                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/ref/heads/${this.branch}`
+            );
+            const currentCommitSha = refData.object.sha;
+
+            const commitData = await this.request(
+                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/commits/${currentCommitSha}`
+            );
+            const baseTreeSha = commitData.tree.sha;
+
+            const blobResponse = await this.request(
+                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/blobs`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        content: btoa(content),
+                        encoding: 'base64'
+                    })
+                }
+            );
+            const newBlobSha = blobResponse.sha;
+
+            const treeResponse = await this.request(
+                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/trees`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        base_tree: baseTreeSha,
+                        tree: [{
+                            path: filePath,
+                            mode: '100644',
+                            type: 'blob',
+                            sha: newBlobSha
+                        }]
+                    })
+                }
+            );
+            const newTreeSha = treeResponse.sha;
+
+            const newCommitResponse = await this.request(
+                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/commits`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        message: commitMessage,
+                        tree: newTreeSha,
+                        parents: [currentCommitSha]
+                    })
+                }
+            );
+            const newCommitSha = newCommitResponse.sha;
+
+            await this.request(
+                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/refs/heads/${this.branch}`,
+                {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        sha: newCommitSha,
+                        force: false
+                    })
+                }
+            );
+
+            return {
+                success: true,
+                commitSha: newCommitSha
+            };
+        } catch (error) {
+            throw new Error(`Failed to push to GitHub: ${error.message}`);
+        }
+    }
+}
+
+function getStoredToken() {
+    return localStorage.getItem('github_token');
+}
+
+function setStoredToken(token) {
+    localStorage.setItem('github_token', token);
+}
+
+function clearStoredToken() {
+    localStorage.removeItem('github_token');
+}
+
+function getStoredFilePath() {
+    return localStorage.getItem('github_file_path') || 'wordlist.dict';
+}
+
+function setStoredFilePath(filePath) {
+    localStorage.setItem('github_file_path', filePath);
+}
+
+function getStoredRepoOwner() {
+    return localStorage.getItem('github_repo_owner') || '';
+}
+
+function setStoredRepoOwner(owner) {
+    localStorage.setItem('github_repo_owner', owner);
+}
+
+function getStoredRepoName() {
+    return localStorage.getItem('github_repo_name') || '';
+}
+
+function setStoredRepoName(name) {
+    localStorage.setItem('github_repo_name', name);
+}
+
+function getStoredBranch() {
+    return localStorage.getItem('github_branch') || DEFAULT_BRANCH;
+}
+
+function setStoredBranch(branch) {
+    localStorage.setItem('github_branch', branch);
+}

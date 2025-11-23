@@ -32,6 +32,80 @@ h1 {
     font-size: 0.9em;
 }
 
+.github-settings {
+    margin-bottom: 20px;
+}
+
+.settings-panel {
+    background: #f0f4f8;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.settings-info {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #e0e7ff;
+    border-radius: 6px;
+}
+
+.settings-info p {
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: #4a5568;
+}
+
+.settings-info a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.settings-info a:hover {
+    text-decoration: underline;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.settings-row label {
+    font-weight: 600;
+    color: #4a5568;
+    min-width: 100px;
+}
+
+.settings-row input[type="text"],
+.settings-row input[type="password"] {
+    flex: 1;
+    min-width: 250px;
+}
+
+.settings-status {
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.settings-status.success {
+    background: #c6f6d5;
+    color: #22543d;
+    border: 1px solid #48bb78;
+}
+
+.settings-status.error {
+    background: #fed7d7;
+    color: #742a2a;
+    border: 1px solid #f56565;
+}
+
 .controls {
     display: flex;
     gap: 10px;
@@ -299,4 +373,30 @@ tr:hover {
 
 .btn:disabled:hover {
     background: #667eea;
+}
+
+.btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spinner 0.6s linear infinite;
+}
+
+@keyframes spinner {
+    to {
+        transform: rotate(360deg);
+    }
 }

@@ -39,7 +39,19 @@ const elements = {
     maxLength: document.getElementById('maxLength'),
     minScore: document.getElementById('minScore'),
     maxScore: document.getElementById('maxScore'),
-    clearFiltersBtn: document.getElementById('clearFiltersBtn')
+    clearFiltersBtn: document.getElementById('clearFiltersBtn'),
+    toggleSettingsBtn: document.getElementById('toggleSettingsBtn'),
+    settingsPanel: document.getElementById('settingsPanel'),
+    githubRepoOwner: document.getElementById('githubRepoOwner'),
+    githubRepoName: document.getElementById('githubRepoName'),
+    githubBranch: document.getElementById('githubBranch'),
+    githubToken: document.getElementById('githubToken'),
+    saveTokenBtn: document.getElementById('saveTokenBtn'),
+    clearTokenBtn: document.getElementById('clearTokenBtn'),
+    githubFilePath: document.getElementById('githubFilePath'),
+    settingsStatus: document.getElementById('settingsStatus'),
+    loadGithubBtn: document.getElementById('loadGithubBtn'),
+    pushGithubBtn: document.getElementById('pushGithubBtn')
 };
 
 function loadFile() {
@@ -267,6 +279,187 @@ function updateStats() {
     elements.wordCount.textContent = `${wordlist.length} words`;
 }
 
+function showStatus(message, isError = false) {
+    elements.settingsStatus.textContent = message;
+    elements.settingsStatus.className = 'settings-status ' + (isError ? 'error' : 'success');
+    elements.settingsStatus.style.display = 'block';
+}
+
+function hideStatus() {
+    elements.settingsStatus.style.display = 'none';
+}
+
+function toggleSettings() {
+    const isVisible = elements.settingsPanel.style.display !== 'none';
+    elements.settingsPanel.style.display = isVisible ? 'none' : 'block';
+}
+
+async function saveToken() {
+    const token = elements.githubToken.value.trim();
+    const repoOwner = elements.githubRepoOwner.value.trim();
+    const repoName = elements.githubRepoName.value.trim();
+    const filePath = elements.githubFilePath.value.trim();
+    const branch = elements.githubBranch.value.trim() || 'main';
+
+    if (!token) {
+        showStatus('Please enter a GitHub token', true);
+        return;
+    }
+
+    if (!repoOwner || !repoName) {
+        showStatus('Please enter repository owner and name', true);
+        return;
+    }
+
+    const api = new GitHubAPI(token, repoOwner, repoName, branch);
+    const isValid = await api.validateToken();
+
+    if (!isValid) {
+        showStatus('Invalid token. Please check your token and try again.', true);
+        return;
+    }
+
+    setStoredToken(token);
+    setStoredRepoOwner(repoOwner);
+    setStoredRepoName(repoName);
+    setStoredFilePath(filePath);
+    setStoredBranch(branch);
+    showStatus('Configuration saved successfully!');
+    elements.pushGithubBtn.disabled = false;
+}
+
+function clearToken() {
+    clearStoredToken();
+    localStorage.removeItem('github_repo_owner');
+    localStorage.removeItem('github_repo_name');
+    localStorage.removeItem('github_file_path');
+    localStorage.removeItem('github_branch');
+    elements.githubToken.value = '';
+    elements.githubRepoOwner.value = '';
+    elements.githubRepoName.value = '';
+    elements.githubFilePath.value = 'wordlist.dict';
+    elements.githubBranch.value = 'main';
+    showStatus('All configuration cleared');
+    elements.pushGithubBtn.disabled = true;
+}
+
+async function loadFromGitHub() {
+    const token = getStoredToken();
+    const repoOwner = getStoredRepoOwner();
+    const repoName = getStoredRepoName();
+    const filePath = getStoredFilePath();
+    const branch = getStoredBranch();
+
+    if (!token || !repoOwner || !repoName) {
+        showStatus('Please save your GitHub configuration first', true);
+        return;
+    }
+
+    elements.loadGithubBtn.classList.add('loading');
+    elements.loadGithubBtn.disabled = true;
+
+    try {
+        const api = new GitHubAPI(token, repoOwner, repoName, branch);
+        const result = await api.loadFromGitHub(filePath);
+
+        wordlist = result.content.trim().split('\n').map(line => {
+            const [word, score] = line.split(';');
+            return {
+                word: word.trim(),
+                score: parseInt(score) || 0
+            };
+        }).filter(item => item.word);
+
+        filteredWordlist = [...wordlist];
+        hasChanges = false;
+        currentFileName = filePath;
+        currentPage = 1;
+        isSearchActive = false;
+
+        elements.fileName.textContent = `${filePath} (from GitHub)`;
+        elements.fileInfo.style.display = 'block';
+        enableControls();
+        renderTable();
+        updateStats();
+        updatePagination();
+        showStatus(`Loaded ${wordlist.length} words from GitHub`);
+    } catch (error) {
+        showStatus(error.message, true);
+    } finally {
+        elements.loadGithubBtn.classList.remove('loading');
+        elements.loadGithubBtn.disabled = false;
+    }
+}
+
+async function pushToGitHub() {
+    const token = getStoredToken();
+    const repoOwner = getStoredRepoOwner();
+    const repoName = getStoredRepoName();
+    const filePath = getStoredFilePath();
+    const branch = getStoredBranch();
+
+    if (!token || !repoOwner || !repoName) {
+        showStatus('Please save your GitHub configuration first', true);
+        return;
+    }
+
+    const commitMessage = prompt('Enter commit message:', 'Update wordlist.dict');
+    if (!commitMessage) return;
+
+    elements.pushGithubBtn.classList.add('loading');
+    elements.pushGithubBtn.disabled = true;
+
+    try {
+        const content = wordlist
+            .map(item => `${item.word};${item.score}`)
+            .join('\n');
+
+        const api = new GitHubAPI(token, repoOwner, repoName, branch);
+        await api.saveToGitHub(filePath, content, commitMessage);
+
+        hasChanges = false;
+        elements.saveBtn.disabled = true;
+        showStatus('Successfully pushed to GitHub!');
+    } catch (error) {
+        showStatus(error.message, true);
+    } finally {
+        elements.pushGithubBtn.classList.remove('loading');
+        elements.pushGithubBtn.disabled = !getStoredToken();
+    }
+}
+
+function initializeGitHub() {
+    const token = getStoredToken();
+    const repoOwner = getStoredRepoOwner();
+    const repoName = getStoredRepoName();
+    const filePath = getStoredFilePath();
+    const branch = getStoredBranch();
+
+    if (token) {
+        elements.githubToken.value = token;
+    }
+
+    if (repoOwner) {
+        elements.githubRepoOwner.value = repoOwner;
+    }
+
+    if (repoName) {
+        elements.githubRepoName.value = repoName;
+    }
+
+    if (filePath) {
+        elements.githubFilePath.value = filePath;
+    }
+
+    if (branch) {
+        elements.githubBranch.value = branch;
+    }
+
+    if (token && repoOwner && repoName) {
+        elements.pushGithubBtn.disabled = false;
+    }
+}
+
 function updatePagination() {
     elements.pagination.style.display = 'flex';
 
@@ -316,6 +509,12 @@ elements.minScore.addEventListener('input', debouncedSearch);
 elements.maxScore.addEventListener('input', debouncedSearch);
 elements.clearFiltersBtn.addEventListener('click', clearFilters);
 
+elements.toggleSettingsBtn.addEventListener('click', toggleSettings);
+elements.saveTokenBtn.addEventListener('click', saveToken);
+elements.clearTokenBtn.addEventListener('click', clearToken);
+elements.loadGithubBtn.addEventListener('click', loadFromGitHub);
+elements.pushGithubBtn.addEventListener('click', pushToGitHub);
+
 elements.newWord.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') addWord();
 });
@@ -343,3 +542,5 @@ window.addEventListener('beforeunload', (e) => {
         e.returnValue = '';
     }
 });
+
+initializeGitHub();

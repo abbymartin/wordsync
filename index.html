@@ -9,14 +9,50 @@
 <body>
     <div class="container">
         <h1>Crossword Wordlist Manager</h1>
+
+        <div class="github-settings">
+            <button class="btn btn-primary" id="toggleSettingsBtn">GitHub Settings</button>
+            <div class="settings-panel" id="settingsPanel" style="display: none;">
+                <div class="settings-info">
+                    <p>Configure GitHub integration. You'll need a <a href="https://github.com/settings/tokens" target="_blank">Personal Access Token</a> with repo access.</p>
+                </div>
+                <div class="settings-row">
+                    <label for="githubRepoOwner">Repository Owner:</label>
+                    <input type="text" id="githubRepoOwner" placeholder="your-username">
+                </div>
+                <div class="settings-row">
+                    <label for="githubRepoName">Repository Name:</label>
+                    <input type="text" id="githubRepoName" placeholder="your-repo-name">
+                </div>
+                <div class="settings-row">
+                    <label for="githubFilePath">File Path:</label>
+                    <input type="text" id="githubFilePath" placeholder="wordlist.dict" value="wordlist.dict">
+                </div>
+                <div class="settings-row">
+                    <label for="githubBranch">Branch:</label>
+                    <input type="text" id="githubBranch" placeholder="main" value="main">
+                </div>
+                <div class="settings-row">
+                    <label for="githubToken">GitHub Token:</label>
+                    <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+                </div>
+                <div class="settings-row">
+                    <button class="btn btn-success" id="saveTokenBtn">Save Configuration</button>
+                    <button class="btn btn-danger" id="clearTokenBtn">Clear All</button>
+                </div>
+                <div class="settings-status" id="settingsStatus"></div>
+            </div>
+        </div>
         <div class="stats">
             <span id="wordCount">0 words</span> |
             <span id="fileName">No file loaded</span>
         </div>
 
         <div class="controls">
-            <button class="btn btn-primary" id="loadBtn">Load wordlist.dict</button>
-            <button class="btn btn-success" id="saveBtn" disabled>Save Changes</button>
+            <button class="btn btn-primary" id="loadBtn">Load Local File</button>
+            <button class="btn btn-primary" id="loadGithubBtn">Load from GitHub</button>
+            <button class="btn btn-success" id="saveBtn" disabled>Download Local</button>
+            <button class="btn btn-success" id="pushGithubBtn" disabled>Push to GitHub</button>
             <input type="text" class="search-box" id="searchBox" placeholder="Search words..." disabled>
         </div>
 
@@ -90,6 +126,7 @@
         </div>
     </div>
 
+    <script src="github.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
