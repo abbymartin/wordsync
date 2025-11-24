@@ -5,23 +5,20 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family:  sans-serif;
+    background: #fffdf7;
     min-height: 100vh;
     padding: 20px;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 80%;
     margin: 0 auto;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     padding: 30px;
 }
 
 h1 {
-    color: #333;
+    color: #4a5568;
     margin-bottom: 10px;
     font-size: 2em;
 }
@@ -272,17 +269,7 @@ tr:hover {
 }
 
 .actions {
-    display: flex;
     gap: 5px;
-}
-
-.file-info {
-    background: #edf2f7;
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    font-size: 0.9em;
-    color: #4a5568;
 }
 
 .loading {

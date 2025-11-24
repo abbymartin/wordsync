@@ -24,7 +24,6 @@ const elements = {
     wordTableBody: document.getElementById('wordTableBody'),
     wordCount: document.getElementById('wordCount'),
     fileName: document.getElementById('fileName'),
-    fileInfo: document.getElementById('fileInfo'),
     pagination: document.getElementById('pagination'),
     paginationInfo: document.getElementById('paginationInfo'),
     currentPageSpan: document.getElementById('currentPage'),
@@ -78,9 +77,8 @@ fileInput.addEventListener('change', async (e) => {
         currentFileName = file.name;
         currentPage = 1;
         isSearchActive = false;
-
-        elements.fileName.textContent = file.name;
-        elements.fileInfo.style.display = 'block';
+        
+        elements.fileName.textContent = `${currentFileName} (local file)`;
         enableControls();
         renderTable();
         updateStats();
@@ -377,7 +375,6 @@ async function loadFromGitHub() {
         isSearchActive = false;
 
         elements.fileName.textContent = `${filePath} (from GitHub)`;
-        elements.fileInfo.style.display = 'block';
         enableControls();
         renderTable();
         updateStats();

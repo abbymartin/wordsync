@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crossword Wordlist Manager</title>
+    <title>WordSync</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.png">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <img src="images/wordsync.png" width="300px"/>
     <div class="container">
         <h1>Crossword Wordlist Manager</h1>
 
@@ -14,7 +16,7 @@
             <button class="btn btn-primary" id="toggleSettingsBtn">GitHub Settings</button>
             <div class="settings-panel" id="settingsPanel" style="display: none;">
                 <div class="settings-info">
-                    <p>Configure GitHub integration. You'll need a <a href="https://github.com/settings/tokens" target="_blank">Personal Access Token</a> with repo access.</p>
+                    <p>Configure GitHub integration. You'll need a <a href="https://github.com/settings/tokens" target="_blank">Personal Access Token</a> with repo read and write access.</p>
                 </div>
                 <div class="settings-row">
                     <label for="githubRepoOwner">Repository Owner:</label>
@@ -53,7 +55,7 @@
             <button class="btn btn-primary" id="loadGithubBtn">Load from GitHub</button>
             <button class="btn btn-success" id="saveBtn" disabled>Download Local</button>
             <button class="btn btn-success" id="pushGithubBtn" disabled>Push to GitHub</button>
-            <input type="text" class="search-box" id="searchBox" placeholder="Search words..." disabled>
+            <input type="text" class="search-box" id="searchBox" placeholder="Search..." disabled>
         </div>
 
         <div class="filter-section" id="filterSection" style="display: none;">
@@ -73,13 +75,9 @@
         </div>
 
         <div class="add-word-section">
-            <input type="text" id="newWord" placeholder="New word" disabled>
+            <input type="text" id="newWord" placeholder="New entry" disabled>
             <input type="number" id="newScore" placeholder="Score" min="0" max="100" value="50" disabled>
-            <button class="btn btn-success" id="addBtn" disabled>Add Word</button>
-        </div>
-
-        <div class="file-info" id="fileInfo" style="display: none;">
-            File loaded successfully. Make your changes and click "Save Changes" to update wordlist.dict
+            <button class="btn btn-success" id="addBtn" disabled>Add Entry</button>
         </div>
 
         <div class="table-container">
@@ -87,7 +85,7 @@
                 <thead>
                     <tr>
                         <th>
-                            Word
+                            Entry
                             <button class="sort-btn" data-sort="word">▲▼</button>
                         </th>
                         <th>
@@ -99,7 +97,7 @@
                 </thead>
                 <tbody id="wordTableBody">
                     <tr>
-                        <td colspan="3" class="loading">Click "Load wordlist.dict" to get started</td>
+                        <td colspan="3" class="loading">Load a wordlist to get started!</td>
                     </tr>
                 </tbody>
             </table>
@@ -126,7 +124,7 @@
         </div>
     </div>
 
-    <script src="github.js"></script>
-    <script src="script.js"></script>
+    <script src="scripts/github.js"></script>
+    <script src="scripts/script.js"></script>
 </body>
 </html>
