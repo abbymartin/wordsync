@@ -21,7 +21,7 @@ body {
     display: flex;
     align-items: center;
     margin: 0 auto;
-    padding-bottom: 20px;
+    padding-bottom: 30px;
     width: 70%;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -29,9 +29,8 @@ body {
 
 h1 {
     color: #4a5568;
-    margin-bottom: 10px;
     font-family: "Cabin", "sans-serif";
-    font-size: 2.2rem;
+    font-size: 2.3rem;
     font-weight: 700;
     text-align: center;
 }
