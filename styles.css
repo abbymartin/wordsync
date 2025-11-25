@@ -5,22 +5,46 @@
 }
 
 body {
-    font-family:  sans-serif;
+    font-family: "Merriweather Sans", sans-serif;
+    font-weight: 400;
     background: #fffdf7;
     min-height: 100vh;
     padding: 20px;
 }
 
-.container {
-    max-width: 80%;
+#heading {
+    display: flex;
+    align-items: center;
     margin: 0 auto;
-    padding: 30px;
+    width: 70%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+@media (max-width: 1100px) {
+    #heading {
+        gap: 1.3rem;
+        justify-content: center;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
 }
 
 h1 {
-    color: #4a5568;
+    color: #3f1909;
     margin-bottom: 10px;
-    font-size: 2em;
+    font-family: "Cabin", "sans-serif";
+    font-size: 2.6em;
+    font-weight: 700;
+    text-align: center;
+}
+
+.container {
+    max-width: 70%;
+    margin: 0 auto;
+    padding: 30px;
 }
 
 .stats {
@@ -35,7 +59,7 @@ h1 {
 
 .settings-panel {
     background: #f0f4f8;
-    border: 2px solid #667eea;
+    border: 2px solid #3e9994;
     border-radius: 8px;
     padding: 20px;
     margin-top: 10px;
@@ -44,7 +68,7 @@ h1 {
 .settings-info {
     margin-bottom: 15px;
     padding: 10px;
-    background: #e0e7ff;
+    background: #e0e9ff;
     border-radius: 6px;
 }
 
@@ -55,7 +79,7 @@ h1 {
 }
 
 .settings-info a {
-    color: #667eea;
+    color: #3e9994;
     text-decoration: none;
     font-weight: 600;
 }
@@ -121,32 +145,32 @@ h1 {
 }
 
 .btn-primary {
-    background: #667eea;
+    background: #3e9994;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #5568d3;
+    background: #327a76;
 }
 
 .btn-success {
-    background: #48bb78;
+    background: #d1744f;
     color: white;
 }
 
 .btn-success:hover {
-    background: #38a169;
+    background: #b85833;
 }
 
 .btn-danger {
-    background: #f56565;
+    background: #c84343;
     color: white;
     padding: 5px 10px;
     font-size: 12px;
 }
 
 .btn-danger:hover {
-    background: #e53e3e;
+    background: #bb2e2e;
 }
 
 input[type="text"],
@@ -162,7 +186,7 @@ input[type="number"] {
 input[type="text"]:focus,
 input[type="number"]:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #3e9994;
 }
 
 .search-box {
@@ -265,7 +289,7 @@ tr:hover {
 
 .score-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #327a76;
 }
 
 .actions {
@@ -350,16 +374,12 @@ tr:hover {
 
 .pagination-settings select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #327a76;
 }
 
 .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-}
-
-.btn:disabled:hover {
-    background: #667eea;
 }
 
 .btn.loading {
