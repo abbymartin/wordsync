@@ -19,72 +19,93 @@
     </div>
     
     <div class="container">
-        <div class="github-settings">
-            <button class="btn btn-primary" id="toggleSettingsBtn">GitHub Settings</button>
-            <div class="settings-panel" id="settingsPanel" style="display: none;">
-                <div class="settings-info">
-                    <p>Configure GitHub integration. You'll need a <a href="https://github.com/settings/tokens" target="_blank">Personal Access Token</a> with repo read and write access.</p>
-                </div>
-                <div class="settings-row">
-                    <label for="githubRepoOwner">Repository Owner:</label>
-                    <input type="text" id="githubRepoOwner" placeholder="your-username">
-                </div>
-                <div class="settings-row">
-                    <label for="githubRepoName">Repository Name:</label>
-                    <input type="text" id="githubRepoName" placeholder="your-repo-name">
-                </div>
-                <div class="settings-row">
-                    <label for="githubFilePath">File Path:</label>
-                    <input type="text" id="githubFilePath" placeholder="wordlist.dict" value="wordlist.dict">
-                </div>
-                <div class="settings-row">
-                    <label for="githubBranch">Branch:</label>
-                    <input type="text" id="githubBranch" placeholder="main" value="main">
-                </div>
-                <div class="settings-row">
-                    <label for="githubToken">GitHub Token:</label>
-                    <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
-                </div>
-                <div class="settings-row">
-                    <button class="btn btn-success" id="saveTokenBtn">Save Configuration</button>
-                    <button class="btn btn-danger" id="clearTokenBtn">Clear All</button>
-                </div>
-                <div class="settings-status" id="settingsStatus"></div>
+        <!-- GitHub Settings Panel (collapsible) -->
+        <div class="settings-panel" id="settingsPanel" style="display: none;">
+            <div class="settings-info">
+                <p>Configure GitHub integration. You'll need a <a href="https://github.com/settings/tokens" target="_blank">Personal Access Token</a> with repo read and write access.</p>
             </div>
+            <div class="settings-row">
+                <label for="githubRepoOwner">Repository Owner:</label>
+                <input type="text" id="githubRepoOwner" placeholder="your-username">
+            </div>
+            <div class="settings-row">
+                <label for="githubRepoName">Repository Name:</label>
+                <input type="text" id="githubRepoName" placeholder="your-repo-name">
+            </div>
+            <div class="settings-row">
+                <label for="githubFilePath">File Path:</label>
+                <input type="text" id="githubFilePath" placeholder="wordlist.dict" value="wordlist.dict">
+            </div>
+            <div class="settings-row">
+                <label for="githubBranch">Branch:</label>
+                <input type="text" id="githubBranch" placeholder="main" value="main">
+            </div>
+            <div class="settings-row">
+                <label for="githubToken">GitHub Token:</label>
+                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+            </div>
+            <div class="settings-row">
+                <button class="btn btn-success" id="saveTokenBtn">Save Configuration</button>
+                <button class="btn btn-danger" id="clearTokenBtn">Clear All</button>
+            </div>
+            <div class="settings-status" id="settingsStatus"></div>
         </div>
+
+        <!-- Row 2: Main Controls -->
+        <div class="main-controls">
+            <button class="btn btn-primary" id="loadBtn">Load</button>
+            <button class="btn btn-success" id="saveBtn" disabled>Save</button>
+
+            <div class="mode-toggle">
+                <span class="mode-label">Local</span>
+                <label class="switch">
+                    <input type="checkbox" id="modeToggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="mode-label">GitHub</span>
+            </div>
+
+            <button class="btn btn-secondary" id="githubSettingsBtn" style="display: none;">⚙</button>
+        </div>
+
+        <!-- Stats (subtle display) -->
         <div class="stats">
             <span id="wordCount">0 words</span> |
             <span id="fileName">No file loaded</span>
         </div>
 
-        <div class="controls">
-            <button class="btn btn-primary" id="loadBtn">Load Local File</button>
-            <button class="btn btn-primary" id="loadGithubBtn">Load from GitHub</button>
-            <button class="btn btn-success" id="saveBtn" disabled>Download Local</button>
-            <button class="btn btn-success" id="pushGithubBtn" disabled>Push to GitHub</button>
+        <!-- Row 3: Search and Action Buttons -->
+        <div class="search-controls">
             <input type="text" class="search-box" id="searchBox" placeholder="Search..." disabled>
+            <button class="btn btn-icon" id="filterToggleBtn" disabled>🔍</button>
+            <button class="btn btn-icon" id="addToggleBtn" disabled>+</button>
         </div>
 
-        <div class="filter-section" id="filterSection" style="display: none;">
-            <div class="filter-group">
-                <label>Word Length:</label>
-                <input type="number" id="minLength" placeholder="Min" min="1" max="50">
-                <span class="filter-separator">to</span>
-                <input type="number" id="maxLength" placeholder="Max" min="1" max="50">
+        <!-- Row 4: Dynamic Panels (Filter or Add Word) -->
+        <div class="dynamic-panel">
+            <!-- Filter Panel -->
+            <div class="filter-panel" id="filterPanel" style="display: none;">
+                <div class="filter-group">
+                    <label>Word Length:</label>
+                    <input type="number" id="minLength" placeholder="Min" min="1" max="50">
+                    <span class="filter-separator">to</span>
+                    <input type="number" id="maxLength" placeholder="Max" min="1" max="50">
+                </div>
+                <div class="filter-group">
+                    <label>Score:</label>
+                    <input type="number" id="minScore" placeholder="Min" min="0" max="100">
+                    <span class="filter-separator">to</span>
+                    <input type="number" id="maxScore" placeholder="Max" min="0" max="100">
+                </div>
+                <button class="btn btn-primary" id="clearFiltersBtn">Clear Filters</button>
             </div>
-            <div class="filter-group">
-                <label>Score:</label>
-                <input type="number" id="minScore" placeholder="Min" min="0" max="100">
-                <span class="filter-separator">to</span>
-                <input type="number" id="maxScore" placeholder="Max" min="0" max="100">
-            </div>
-            <button class="btn btn-primary" id="clearFiltersBtn">Clear Filters</button>
-        </div>
 
-        <div class="add-word-section">
-            <input type="text" id="newWord" placeholder="New entry" disabled>
-            <input type="number" id="newScore" placeholder="Score" min="0" max="100" value="50" disabled>
-            <button class="btn btn-success" id="addBtn" disabled>Add Entry</button>
+            <!-- Add Word Panel -->
+            <div class="add-word-panel" id="addWordPanel" style="display: none;">
+                <input type="text" id="newWord" placeholder="New entry">
+                <input type="number" id="newScore" placeholder="Score" min="0" max="100" value="50">
+                <button class="btn btn-success" id="addBtn">Add Entry</button>
+            </div>
         </div>
 
         <div class="table-container">

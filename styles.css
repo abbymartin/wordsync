@@ -53,16 +53,13 @@ h1 {
     font-size: 0.9em;
 }
 
-.github-settings {
-    margin-bottom: 20px;
-}
-
 .settings-panel {
     background: #f0f4f8;
     border: 2px solid #3e9994;
     border-radius: 8px;
     padding: 20px;
-    margin-top: 10px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
 }
 
 .settings-info {
@@ -127,11 +124,150 @@ h1 {
     border: 1px solid #f56565;
 }
 
-.controls {
+/* Main Controls (Row 2) */
+.main-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Mode Toggle Switch */
+.mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
+}
+
+.mode-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #3e9994;
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #d1744f;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* Search Controls (Row 3) */
+.search-controls {
     display: flex;
     gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.search-controls .search-box {
+    flex: 1;
+}
+
+.btn-icon {
+    padding: 10px 16px;
+    font-size: 18px;
+    min-width: 44px;
+    background: #3e9994;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-icon:hover:not(:disabled) {
+    background: #327a76;
+    transform: scale(1.05);
+}
+
+.btn-icon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: #718096;
+    color: white;
+    padding: 10px 16px;
+}
+
+.btn-secondary:hover {
+    background: #4a5568;
+}
+
+/* Dynamic Panel Container */
+.dynamic-panel {
     margin-bottom: 20px;
+    min-height: 0;
+    transition: all 0.3s ease;
+}
+
+.filter-panel,
+.add-word-panel {
+    background: #edf2f7;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    gap: 15px;
     flex-wrap: wrap;
+    align-items: center;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.add-word-panel {
+    background: #f7fafc;
 }
 
 .btn {
@@ -194,17 +330,6 @@ input[type="number"]:focus {
     min-width: 300px;
 }
 
-.filter-section {
-    background: #edf2f7;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
 .filter-group {
     display: flex;
     align-items: center;
@@ -226,17 +351,6 @@ input[type="number"]:focus {
 .filter-separator {
     color: #4a5568;
     font-weight: 500;
-}
-
-.add-word-section {
-    background: #f7fafc;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
 }
 
 .table-container {

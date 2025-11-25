@@ -7,6 +7,7 @@ let currentPage = 1;
 let itemsPerPage = 100;
 let isSearchActive = false;
 let searchDebounceTimer = null;
+let isGitHubMode = false;
 
 const fileInput = document.createElement('input');
 fileInput.type = 'file';
@@ -33,13 +34,11 @@ const elements = {
     nextPageBtn: document.getElementById('nextPageBtn'),
     lastPageBtn: document.getElementById('lastPageBtn'),
     itemsPerPageSelect: document.getElementById('itemsPerPage'),
-    filterSection: document.getElementById('filterSection'),
     minLength: document.getElementById('minLength'),
     maxLength: document.getElementById('maxLength'),
     minScore: document.getElementById('minScore'),
     maxScore: document.getElementById('maxScore'),
     clearFiltersBtn: document.getElementById('clearFiltersBtn'),
-    toggleSettingsBtn: document.getElementById('toggleSettingsBtn'),
     settingsPanel: document.getElementById('settingsPanel'),
     githubRepoOwner: document.getElementById('githubRepoOwner'),
     githubRepoName: document.getElementById('githubRepoName'),
@@ -49,12 +48,63 @@ const elements = {
     clearTokenBtn: document.getElementById('clearTokenBtn'),
     githubFilePath: document.getElementById('githubFilePath'),
     settingsStatus: document.getElementById('settingsStatus'),
-    loadGithubBtn: document.getElementById('loadGithubBtn'),
-    pushGithubBtn: document.getElementById('pushGithubBtn')
+    modeToggle: document.getElementById('modeToggle'),
+    githubSettingsBtn: document.getElementById('githubSettingsBtn'),
+    filterToggleBtn: document.getElementById('filterToggleBtn'),
+    addToggleBtn: document.getElementById('addToggleBtn'),
+    filterPanel: document.getElementById('filterPanel'),
+    addWordPanel: document.getElementById('addWordPanel')
 };
 
+function toggleMode() {
+    isGitHubMode = elements.modeToggle.checked;
+
+    if (isGitHubMode) {
+        elements.githubSettingsBtn.style.display = 'inline-block';
+    } else {
+        elements.githubSettingsBtn.style.display = 'none';
+    }
+}
+
+function toggleSettings() {
+    const panel = elements.settingsPanel;
+    if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+    } else {
+        panel.style.display = 'none';
+    }
+}
+
+function toggleFilterPanel() {
+    const filterPanel = elements.filterPanel;
+    const addWordPanel = elements.addWordPanel;
+
+    if (filterPanel.style.display === 'none') {
+        filterPanel.style.display = 'flex';
+        addWordPanel.style.display = 'none';
+    } else {
+        filterPanel.style.display = 'none';
+    }
+}
+
+function toggleAddWordPanel() {
+    const filterPanel = elements.filterPanel;
+    const addWordPanel = elements.addWordPanel;
+
+    if (addWordPanel.style.display === 'none') {
+        addWordPanel.style.display = 'flex';
+        filterPanel.style.display = 'none';
+    } else {
+        addWordPanel.style.display = 'none';
+    }
+}
+
 function loadFile() {
-    fileInput.click();
+    if (isGitHubMode) {
+        loadFromGitHub();
+    } else {
+        fileInput.click();
+    }
 }
 
 fileInput.addEventListener('change', async (e) => {
@@ -89,31 +139,33 @@ fileInput.addEventListener('change', async (e) => {
 });
 
 function saveFile() {
-    const content = wordlist
-        .map(item => `${item.word};${item.score}`)
-        .join('\n');
+    if (isGitHubMode) {
+        pushToGitHub();
+    } else {
+        const content = wordlist
+            .map(item => `${item.word};${item.score}`)
+            .join('\n');
 
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = currentFileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = currentFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
 
-    hasChanges = false;
-    elements.saveBtn.disabled = true;
-    alert('File downloaded! Replace your original wordlist.dict file with the downloaded file.');
+        hasChanges = false;
+        elements.saveBtn.disabled = true;
+        alert('File downloaded! Replace your original wordlist.dict file with the downloaded file.');
+    }
 }
 
 function enableControls() {
     elements.searchBox.disabled = false;
-    elements.newWord.disabled = false;
-    elements.newScore.disabled = false;
-    elements.addBtn.disabled = false;
-    elements.filterSection.style.display = 'flex';
+    elements.filterToggleBtn.disabled = false;
+    elements.addToggleBtn.disabled = false;
 }
 
 function clearFilters() {
@@ -323,7 +375,6 @@ async function saveToken() {
     setStoredFilePath(filePath);
     setStoredBranch(branch);
     showStatus('Configuration saved successfully!');
-    elements.pushGithubBtn.disabled = false;
 }
 
 function clearToken() {
@@ -338,7 +389,6 @@ function clearToken() {
     elements.githubFilePath.value = 'wordlist.dict';
     elements.githubBranch.value = 'main';
     showStatus('All configuration cleared');
-    elements.pushGithubBtn.disabled = true;
 }
 
 async function loadFromGitHub() {
@@ -353,8 +403,8 @@ async function loadFromGitHub() {
         return;
     }
 
-    elements.loadGithubBtn.classList.add('loading');
-    elements.loadGithubBtn.disabled = true;
+    elements.loadBtn.classList.add('loading');
+    elements.loadBtn.disabled = true;
 
     try {
         const api = new GitHubAPI(token, repoOwner, repoName, branch);
@@ -383,8 +433,8 @@ async function loadFromGitHub() {
     } catch (error) {
         showStatus(error.message, true);
     } finally {
-        elements.loadGithubBtn.classList.remove('loading');
-        elements.loadGithubBtn.disabled = false;
+        elements.loadBtn.classList.remove('loading');
+        elements.loadBtn.disabled = false;
     }
 }
 
@@ -403,8 +453,8 @@ async function pushToGitHub() {
     const commitMessage = prompt('Enter commit message:', 'Update wordlist.dict');
     if (!commitMessage) return;
 
-    elements.pushGithubBtn.classList.add('loading');
-    elements.pushGithubBtn.disabled = true;
+    elements.saveBtn.classList.add('loading');
+    elements.saveBtn.disabled = true;
 
     try {
         const content = wordlist
@@ -420,8 +470,8 @@ async function pushToGitHub() {
     } catch (error) {
         showStatus(error.message, true);
     } finally {
-        elements.pushGithubBtn.classList.remove('loading');
-        elements.pushGithubBtn.disabled = !getStoredToken();
+        elements.saveBtn.classList.remove('loading');
+        elements.saveBtn.disabled = false;
     }
 }
 
@@ -450,10 +500,6 @@ function initializeGitHub() {
 
     if (branch) {
         elements.githubBranch.value = branch;
-    }
-
-    if (token && repoOwner && repoName) {
-        elements.pushGithubBtn.disabled = false;
     }
 }
 
@@ -506,11 +552,13 @@ elements.minScore.addEventListener('input', debouncedSearch);
 elements.maxScore.addEventListener('input', debouncedSearch);
 elements.clearFiltersBtn.addEventListener('click', clearFilters);
 
-elements.toggleSettingsBtn.addEventListener('click', toggleSettings);
+elements.modeToggle.addEventListener('change', toggleMode);
+elements.githubSettingsBtn.addEventListener('click', toggleSettings);
+elements.filterToggleBtn.addEventListener('click', toggleFilterPanel);
+elements.addToggleBtn.addEventListener('click', toggleAddWordPanel);
+
 elements.saveTokenBtn.addEventListener('click', saveToken);
 elements.clearTokenBtn.addEventListener('click', clearToken);
-elements.loadGithubBtn.addEventListener('click', loadFromGitHub);
-elements.pushGithubBtn.addEventListener('click', pushToGitHub);
 
 elements.newWord.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') addWord();
