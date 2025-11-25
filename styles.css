@@ -384,10 +384,6 @@ td {
     border-bottom: 1px solid #e2e8f0;
 }
 
-tr:hover {
-    background: #f7fafc;
-}
-
 .word-cell {
     font-weight: 600;
     color: #2d3748;
@@ -404,10 +400,6 @@ tr:hover {
 .score-input:focus {
     outline: none;
     border-color: #327a76;
-}
-
-.actions {
-    gap: 5px;
 }
 
 .loading {

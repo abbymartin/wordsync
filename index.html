@@ -7,7 +7,7 @@
     <link rel="icon" type="image/x-icon" href="images/favicon.png">
     <link rel="stylesheet" href="styles.css">
 
-    <!-- fonts-->
+    <!-- Fonts-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
     </div>
     
     <div class="container">
-        <!-- GitHub Settings Panel (collapsible) -->
+        <!-- GitHub settings panel -->
         <div class="settings-panel" id="settingsPanel" style="display: none;">
             <div class="settings-info">
                 <p>Configure GitHub integration. You'll need a <a href="https://github.com/settings/tokens" target="_blank">Personal Access Token</a> with repo read and write access.</p>
@@ -51,7 +51,7 @@
             <div class="settings-status" id="settingsStatus"></div>
         </div>
 
-        <!-- Row 2: Main Controls -->
+        <!-- Load/Save -->
         <div class="main-controls">
             <button class="btn btn-primary" id="loadBtn">Load</button>
             <button class="btn btn-success" id="saveBtn" disabled>Save</button>
@@ -68,22 +68,21 @@
             <button class="btn btn-secondary" id="githubSettingsBtn" style="display: none;">⚙</button>
         </div>
 
-        <!-- Stats (subtle display) -->
+        <!-- Stats -->
         <div class="stats">
             <span id="wordCount">0 words</span> |
             <span id="fileName">No file loaded</span>
         </div>
 
-        <!-- Row 3: Search and Action Buttons -->
+        <!-- Search, filter, add word -->
         <div class="search-controls">
             <input type="text" class="search-box" id="searchBox" placeholder="Search..." disabled>
             <button class="btn btn-icon" id="filterToggleBtn" disabled>🔍</button>
             <button class="btn btn-icon" id="addToggleBtn" disabled>+</button>
         </div>
 
-        <!-- Row 4: Dynamic Panels (Filter or Add Word) -->
+        <!-- Filter/add word panel -->
         <div class="dynamic-panel">
-            <!-- Filter Panel -->
             <div class="filter-panel" id="filterPanel" style="display: none;">
                 <div class="filter-group">
                     <label>Word Length:</label>
@@ -100,7 +99,6 @@
                 <button class="btn btn-primary" id="clearFiltersBtn">Clear Filters</button>
             </div>
 
-            <!-- Add Word Panel -->
             <div class="add-word-panel" id="addWordPanel" style="display: none;">
                 <input type="text" id="newWord" placeholder="New entry">
                 <input type="number" id="newScore" placeholder="Score" min="0" max="100" value="50">

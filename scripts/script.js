@@ -9,6 +9,8 @@ let isSearchActive = false;
 let searchDebounceTimer = null;
 let isGitHubMode = false;
 
+const SEARCH_DEBOUNCE_MS = 300;
+
 const fileInput = document.createElement('input');
 fileInput.type = 'file';
 fileInput.accept = '.dict';
@@ -99,6 +101,20 @@ function toggleAddWordPanel() {
     }
 }
 
+function initializeWordlist(words, fileName, source) {
+    wordlist = words;
+    filteredWordlist = [...wordlist];
+    hasChanges = false;
+    currentFileName = fileName;
+    currentPage = 1;
+    isSearchActive = false;
+    elements.fileName.textContent = `${fileName} ${source}`;
+    enableControls();
+    renderTable();
+    updateStats();
+    updatePagination();
+}
+
 function loadFile() {
     if (isGitHubMode) {
         loadFromGitHub();
@@ -114,7 +130,7 @@ fileInput.addEventListener('change', async (e) => {
     try {
         const content = await file.text();
 
-        wordlist = content.trim().split('\n').map(line => {
+        const words = content.trim().split('\n').map(line => {
             const [word, score] = line.split(';');
             return {
                 word: word.trim(),
@@ -122,17 +138,7 @@ fileInput.addEventListener('change', async (e) => {
             };
         }).filter(item => item.word);
 
-        filteredWordlist = [...wordlist];
-        hasChanges = false;
-        currentFileName = file.name;
-        currentPage = 1;
-        isSearchActive = false;
-        
-        elements.fileName.textContent = `${currentFileName} (local file)`;
-        enableControls();
-        renderTable();
-        updateStats();
-        updatePagination();
+        initializeWordlist(words, file.name, '(local file)');
     } catch (error) {
         alert('Error loading file: ' + error.message);
     }
@@ -257,7 +263,7 @@ function debouncedSearch() {
     clearTimeout(searchDebounceTimer);
     searchDebounceTimer = setTimeout(() => {
         applyFilter();
-    }, 300);
+    }, SEARCH_DEBOUNCE_MS);
 }
 
 function sortTable(column) {
@@ -335,15 +341,6 @@ function showStatus(message, isError = false) {
     elements.settingsStatus.style.display = 'block';
 }
 
-function hideStatus() {
-    elements.settingsStatus.style.display = 'none';
-}
-
-function toggleSettings() {
-    const isVisible = elements.settingsPanel.style.display !== 'none';
-    elements.settingsPanel.style.display = isVisible ? 'none' : 'block';
-}
-
 async function saveToken() {
     const token = elements.githubToken.value.trim();
     const repoOwner = elements.githubRepoOwner.value.trim();
@@ -410,7 +407,7 @@ async function loadFromGitHub() {
         const api = new GitHubAPI(token, repoOwner, repoName, branch);
         const result = await api.loadFromGitHub(filePath);
 
-        wordlist = result.content.trim().split('\n').map(line => {
+        const words = result.content.trim().split('\n').map(line => {
             const [word, score] = line.split(';');
             return {
                 word: word.trim(),
@@ -418,18 +415,8 @@ async function loadFromGitHub() {
             };
         }).filter(item => item.word);
 
-        filteredWordlist = [...wordlist];
-        hasChanges = false;
-        currentFileName = filePath;
-        currentPage = 1;
-        isSearchActive = false;
-
-        elements.fileName.textContent = `${filePath} (from GitHub)`;
-        enableControls();
-        renderTable();
-        updateStats();
-        updatePagination();
-        showStatus(`Loaded ${wordlist.length} words from GitHub`);
+        initializeWordlist(words, filePath, '(from GitHub)');
+        showStatus(`Loaded ${words.length} words from GitHub`);
     } catch (error) {
         showStatus(error.message, true);
     } finally {
@@ -465,13 +452,12 @@ async function pushToGitHub() {
         await api.saveToGitHub(filePath, content, commitMessage);
 
         hasChanges = false;
-        elements.saveBtn.disabled = true;
         showStatus('Successfully pushed to GitHub!');
     } catch (error) {
         showStatus(error.message, true);
     } finally {
         elements.saveBtn.classList.remove('loading');
-        elements.saveBtn.disabled = false;
+        elements.saveBtn.disabled = !hasChanges;
     }
 }
 
