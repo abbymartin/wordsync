@@ -13,7 +13,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 const fileInput = document.createElement('input');
 fileInput.type = 'file';
-fileInput.accept = '.dict';
+fileInput.accept = '.dict, .txt';
 fileInput.style.display = 'none';
 document.body.appendChild(fileInput);
 
@@ -63,8 +63,17 @@ function toggleMode() {
 
     if (isGitHubMode) {
         elements.githubSettingsBtn.style.display = 'inline-block';
+        elements.loadBtn.classList.remove('btn-local');
+        elements.loadBtn.classList.add('btn-github');
+        elements.saveBtn.classList.remove('btn-local');
+        elements.saveBtn.classList.add('btn-github');
     } else {
         elements.githubSettingsBtn.style.display = 'none';
+        elements.settingsPanel.style.display = 'none';
+        elements.loadBtn.classList.remove('btn-github');
+        elements.loadBtn.classList.add('btn-local');
+        elements.saveBtn.classList.remove('btn-github');
+        elements.saveBtn.classList.add('btn-local');
     }
 }
 
@@ -164,7 +173,7 @@ function saveFile() {
 
         hasChanges = false;
         elements.saveBtn.disabled = true;
-        alert('File downloaded! Replace your original wordlist.dict file with the downloaded file.');
+        alert('File downloaded! Replace your original wordlist file with the downloaded file.');
     }
 }
 
@@ -437,7 +446,7 @@ async function pushToGitHub() {
         return;
     }
 
-    const commitMessage = prompt('Enter commit message:', 'Update wordlist.dict');
+    const commitMessage = prompt('Enter commit message:', 'Update wordlist');
     if (!commitMessage) return;
 
     elements.saveBtn.classList.add('loading');
@@ -573,5 +582,12 @@ window.addEventListener('beforeunload', (e) => {
         e.returnValue = '';
     }
 });
+
+// Initialize mode to Local on page load
+elements.modeToggle.checked = false;
+isGitHubMode = false;
+elements.githubSettingsBtn.style.display = 'none';
+elements.loadBtn.classList.add('btn-local');
+elements.saveBtn.classList.add('btn-local');
 
 initializeGitHub();
