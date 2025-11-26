@@ -1,3 +1,23 @@
+:root {
+    --background-color: #d8e0e7;
+
+    --main-color: #4a5568;
+
+    --accent-color: #446db2;
+    --accent-color-dark: #334668;
+
+    --local-color: #e06a3c;
+    --local-color-dark: #be5932;
+    --github-color: #3e9994;
+    --github-color-dark: #327a76;
+
+    --danger-color: #c84343;;
+    --danger-color-dark: #bb2e2e;
+
+    --panel-color: #eff4f9;
+    --panel-color-dark: #e0e9f8;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -12,12 +32,20 @@ body {
 body {
     font-family: "Merriweather Sans", sans-serif;
     font-weight: 400;
-    background: #d8e0e7;
+    background: var(--background-color);
     min-height: 100vh;
     padding: 20px;
 }
 
-#heading {
+h1 {
+    color: var(--accent-color-dark);
+    font-family: "Cabin", "sans-serif";
+    font-size: 2.4rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.header {
     display: flex;
     align-items: center;
     margin: 0 auto;
@@ -27,12 +55,12 @@ body {
     justify-content: space-between;
 }
 
-h1 {
-    color: #4a5568;
-    font-family: "Cabin", "sans-serif";
-    font-size: 2.3rem;
-    font-weight: 700;
-    text-align: center;
+.footer {
+    margin: 0 auto;
+    width: 70%;
+    padding: 20px 0px;
+    color: var(--accent-color-dark);
+    font-size: 1.1em;
 }
 
 .container {
@@ -50,7 +78,7 @@ h1 {
 }
 
 .settings-panel {
-    background: #eff4f9;
+    background: var(--panel-color);
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
@@ -60,23 +88,23 @@ h1 {
 .settings-info {
     margin-bottom: 15px;
     padding: 10px;
-    background: #e0e9f8;
+    background: var(--panel-color-dark);
     border-radius: 6px;
 }
 
 .settings-info p {
     margin: 5px 0;
     font-size: 0.9em;
-    color: #4a5568;
+    color: var(--main-color);
 }
 
-.settings-info a {
-    color: #327a76;
+a {
+    color: #3762a6;
     text-decoration: none;
     font-weight: 600;
 }
 
-.settings-info a:hover {
+a:hover {
     text-decoration: underline;
 }
 
@@ -90,7 +118,7 @@ h1 {
 
 .settings-row label {
     font-weight: 600;
-    color: #4a5568;
+    color: var(--main-color);
     min-width: 100px;
 }
 
@@ -137,7 +165,7 @@ h1 {
 .mode-label {
     font-size: 14px;
     font-weight: 600;
-    color: #4a5568;
+    color: var(--main-color);
 }
 
 .switch {
@@ -160,7 +188,7 @@ h1 {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #e06a3c;
+    background-color: var(--local-color);
     transition: 0.3s;
     border-radius: 26px;
 }
@@ -178,7 +206,7 @@ h1 {
 }
 
 input:checked + .slider {
-    background-color: #3e9994;
+    background-color: var(--github-color);
 }
 
 input:checked + .slider:before {
@@ -230,7 +258,7 @@ input:checked + .slider:before {
 
 .filter-panel,
 .add-word-panel {
-    background: #eff4f9;
+    background: var(--panel-color);
     padding: 15px;
     border-radius: 8px;
     display: flex;
@@ -256,41 +284,41 @@ input:checked + .slider:before {
 }
 
 .btn-primary {
-    background: #3e9994;
+    background: var(--accent-color);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #327a76;
+    background: var(--accent-color-dark);
 }
 
 .btn-local {
-    background: #e06a3c;
+    background: var(--local-color);
     color: white;
 }
 
 .btn-local:hover:not(:disabled) {
-    background: #be5932;
+    background: var(--local-color-dark);
 }
 
 .btn-github {
-    background: #3e9994;
+    background: var(--github-color);
     color: white;
 }
 
 .btn-github:hover:not(:disabled) {
-    background: #327a76;
+    background: var(--github-color-dark);
 }
 
 .btn-danger {
-    background: #c84343;
+    background: var(--danger-color);
     color: white;
     padding: 6px 12px;
     font-size: 12px;
 }
 
 .btn-danger:hover {
-    background: #bb2e2e;
+    background: var(--danger-color-dark);
 }
 
 input[type="text"],
@@ -306,7 +334,7 @@ input[type="number"] {
 input[type="text"]:focus,
 input[type="number"]:focus {
     outline: none;
-    border-color: #3e9994;
+    border-color: var(--accent-color);
 }
 
 .search-box {
@@ -322,7 +350,7 @@ input[type="number"]:focus {
 
 .filter-group label {
     font-weight: 600;
-    color: #4a5568;
+    color: var(--main-color);
     white-space: nowrap;
 }
 
@@ -333,7 +361,7 @@ input[type="number"]:focus {
 }
 
 .filter-separator {
-    color: #4a5568;
+    color: var(--main-color);
     font-weight: 500;
 }
 
@@ -352,7 +380,7 @@ table {
 thead {
     position: sticky;
     top: 0;
-    background: #4a5568;
+    background: var(--main-color);
     color: white;
     z-index: 10;
 }
@@ -364,7 +392,7 @@ th {
 }
 
 td {
-    padding: 10px 12px;
+    padding: 8px 12px;
     border-bottom: 1px solid #e2e8f0;
 }
 
@@ -383,7 +411,7 @@ td {
 
 .score-input:focus {
     outline: none;
-    border-color: #327a76;
+    border-color: var(--accent-color);
 }
 
 .loading {
@@ -414,7 +442,7 @@ td {
 .pagination {
     margin-top: 20px;
     padding: 15px;
-    background: #eff4f9;
+    background: var(--panel-color);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -423,7 +451,7 @@ td {
 
 .pagination-info {
     text-align: center;
-    color: #4a5568;
+    color: var(--main-color);
     font-weight: 600;
 }
 
@@ -437,7 +465,7 @@ td {
 
 .page-indicator {
     padding: 0 15px;
-    color: #4a5568;
+    color: var(--main-color);
     font-weight: 600;
 }
 
@@ -448,7 +476,7 @@ td {
 }
 
 .pagination-settings label {
-    color: #4a5568;
+    color: var(--main-color);
     font-weight: 600;
 }
 
@@ -503,7 +531,7 @@ td {
         padding: 10px;
     }
 
-    #heading {
+    .header {
         gap: 1.3rem;
         justify-content: center;
         width: 85%;
@@ -541,8 +569,6 @@ td {
     }
 
     .btn-danger {
-        background: #c84343;
-        color: white;
         padding: 5px 10px;
         font-size: 11px;
     }
