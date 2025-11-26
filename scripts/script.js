@@ -24,6 +24,7 @@ const elements = {
     newWord: document.getElementById('newWord'),
     newScore: document.getElementById('newScore'),
     addBtn: document.getElementById('addBtn'),
+    tableContainer: document.getElementById('tableContainer'),
     wordTableBody: document.getElementById('wordTableBody'),
     wordCount: document.getElementById('wordCount'),
     fileName: document.getElementById('fileName'),
@@ -189,7 +190,7 @@ function clearFilters() {
     elements.maxLength.value = '';
     elements.minScore.value = '';
     elements.maxScore.value = '';
-    applyFilter();
+    applyFilter(true);
 }
 
 function markChanged() {
@@ -219,7 +220,7 @@ function addWord() {
     elements.newScore.value = '50';
 
     markChanged();
-    applyFilter();
+    applyFilter(false);
     updateStats();
     updatePagination();
 }
@@ -231,7 +232,7 @@ function deleteWord(word) {
     if (index !== -1) {
         wordlist.splice(index, 1);
         markChanged();
-        applyFilter();
+        applyFilter(false);
         updateStats();
         updatePagination();
     }
@@ -245,15 +246,15 @@ function updateScore(word, newScore) {
     }
 }
 
-function applyFilter() {
+function applyFilter(resetPage) {
     const searchTerm = elements.searchBox.value.toUpperCase();
     const minLen = parseInt(elements.minLength.value) || 0;
     const maxLen = parseInt(elements.maxLength.value) || Infinity;
     const minScr = parseInt(elements.minScore.value) || 0;
-    const maxScr = parseInt(elements.maxScore.value) || 100;
+    const maxScr = parseInt(elements.maxScore.value) || Infinity;
 
     isSearchActive = searchTerm.length > 0 || minLen > 0 || maxLen < Infinity ||
-                     minScr > 0 || maxScr < 100;
+                     minScr > 0 || maxScr < Infinity;
 
     filteredWordlist = wordlist.filter(item => {
         const matchesSearch = item.word.includes(searchTerm);
@@ -263,7 +264,10 @@ function applyFilter() {
         return matchesSearch && matchesLength && matchesScore;
     });
 
-    currentPage = 1;
+    if (resetPage) {
+        currentPage = 1;
+    }
+
     renderTable();
     updatePagination();
 }
@@ -271,7 +275,7 @@ function applyFilter() {
 function debouncedSearch() {
     clearTimeout(searchDebounceTimer);
     searchDebounceTimer = setTimeout(() => {
-        applyFilter();
+        applyFilter(true);
     }, SEARCH_DEBOUNCE_MS);
 }
 
@@ -526,6 +530,7 @@ function goToPage(page) {
     const totalPages = Math.ceil(filteredWordlist.length / itemsPerPage);
     currentPage = Math.max(1, Math.min(page, totalPages));
     renderTable();
+    tableContainer.scrollTop = 0;
     updatePagination();
 }
 
