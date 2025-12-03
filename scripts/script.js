@@ -30,7 +30,7 @@ const elements = {
     fileName: document.getElementById('fileName'),
     pagination: document.getElementById('pagination'),
     paginationInfo: document.getElementById('paginationInfo'),
-    currentPageSpan: document.getElementById('currentPage'),
+    pageInput: document.getElementById('pageInput'),
     totalPagesSpan: document.getElementById('totalPages'),
     firstPageBtn: document.getElementById('firstPageBtn'),
     prevPageBtn: document.getElementById('prevPageBtn'),
@@ -517,7 +517,8 @@ function updatePagination() {
     }
 
     elements.paginationInfo.textContent = infoText;
-    elements.currentPageSpan.textContent = currentPage;
+    elements.pageInput.value = currentPage;
+    elements.pageInput.max = totalPages;
     elements.totalPagesSpan.textContent = totalPages;
 
     elements.firstPageBtn.disabled = currentPage === 1;
@@ -579,6 +580,22 @@ elements.lastPageBtn.addEventListener('click', () => {
 });
 elements.itemsPerPageSelect.addEventListener('change', (e) => {
     changeItemsPerPage(e.target.value);
+});
+
+elements.pageInput.addEventListener('change', (e) => {
+    const pageNumber = parseInt(e.target.value);
+    if (!isNaN(pageNumber)) {
+        goToPage(pageNumber);
+    }
+});
+
+elements.pageInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        const pageNumber = parseInt(e.target.value);
+        if (!isNaN(pageNumber)) {
+            goToPage(pageNumber);
+        }
+    }
 });
 
 window.addEventListener('beforeunload', (e) => {

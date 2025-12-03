@@ -11,7 +11,7 @@
     --github-color: #3e9994;
     --github-color-dark: #327a76;
 
-    --danger-color: #c84343;;
+    --danger-color: #c84343;
     --danger-color-dark: #bb2e2e;
 
     --panel-color: #eff4f9;
@@ -328,8 +328,9 @@ input[type="number"] {
     border-radius: 6px;
     font-size: 14px;
     flex: 1;
-    min-width: 150px;
+    width: 120px;
 }
+
 
 input[type="text"]:focus,
 input[type="number"]:focus {
@@ -356,7 +357,6 @@ input[type="number"]:focus {
 
 .filter-group input[type="number"] {
     width: 80px;
-    min-width: 80px;
     padding: 8px;
 }
 
@@ -469,6 +469,13 @@ td {
     font-weight: 600;
 }
 
+.page-input {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--main-color);
+}
+
 .pagination-settings {
     display: flex;
     justify-content: center;
@@ -552,16 +559,16 @@ td {
     .pagination .btn {
         padding: 10px 12px;
     }
+
+    input[type="text"],
+    input[type="number"] {
+        width: 80px;
+    }
 }
 
 @media (max-width: 820px) {
     .search-box {
         min-width: 150px;
-    }
-
-    input[type="text"],
-    input[type="number"] {
-        min-width: 100px;
     }
 
     .settings-row input[type="text"],
@@ -598,7 +605,7 @@ td {
 
     .page-indicator {
         padding: 0px 6px;
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .pagination {
@@ -623,7 +630,6 @@ td {
     }
 
     .score-input {
-        width: 50px;
         padding: 3px;
         font-size: 12px;
     }
