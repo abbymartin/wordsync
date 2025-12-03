@@ -107,6 +107,24 @@
             </div>
         </div>
 
+        <div class="confirmation-modal" id="duplicateModal" style="display: none;">
+            <div class="modal-content">
+                <h3>Word Already Exists</h3>
+                <p id="duplicateMessage"></p>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="updateScoreBtn">Update Score</button>
+                    <button class="btn btn-primary" id="cancelDuplicateBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="notification-modal" id="notificationModal" style="display: none;">
+            <div class="modal-content">
+                <p id="notificationMessage"></p>
+                <button class="btn btn-primary" id="closeNotificationBtn">OK</button>
+            </div>
+        </div>
+
         <div class="table-container" id="tableContainer">
             <table id="wordTable">
                 <thead>

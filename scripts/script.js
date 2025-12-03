@@ -55,6 +55,13 @@ const elements = {
     githubSettingsBtn: document.getElementById('githubSettingsBtn'),
     filterToggleBtn: document.getElementById('filterToggleBtn'),
     addToggleBtn: document.getElementById('addToggleBtn'),
+    duplicateModal: document.getElementById('duplicateModal'),
+    duplicateMessage: document.getElementById('duplicateMessage'),
+    updateScoreBtn: document.getElementById('updateScoreBtn'),
+    cancelDuplicateBtn: document.getElementById('cancelDuplicateBtn'),
+    notificationModal: document.getElementById('notificationModal'),
+    notificationMessage: document.getElementById('notificationMessage'),
+    closeNotificationBtn: document.getElementById('closeNotificationBtn'),
     filterPanel: document.getElementById('filterPanel'),
     addWordPanel: document.getElementById('addWordPanel')
 };
@@ -193,6 +200,46 @@ function clearFilters() {
     applyFilter(true);
 }
 
+function showDuplicateConfirmation(word, currentScore, newScore, existingIndex) {
+    elements.duplicateMessage.innerHTML = `
+        The word <strong>"${word}"</strong> already exists.<br>
+        Current score: <strong>${currentScore}</strong><br>
+        New score: <strong>${newScore}</strong><br><br>
+        Do you want to update the score?
+    `;
+
+    elements.duplicateModal.style.display = 'flex';
+
+    // Store the data for the update action
+    elements.updateScoreBtn.onclick = () => {
+        wordlist[existingIndex].score = newScore;
+        elements.duplicateModal.style.display = 'none';
+
+        // Clear inputs
+        elements.newWord.value = '';
+        elements.newScore.value = '50';
+
+        // Update UI
+        markChanged();
+        applyFilter(false);
+        updateStats();
+        updatePagination();
+    };
+
+    elements.cancelDuplicateBtn.onclick = () => {
+        elements.duplicateModal.style.display = 'none';
+    };
+}
+
+function showNotification(message) {
+    elements.notificationMessage.textContent = message;
+    elements.notificationModal.style.display = 'flex';
+
+    elements.closeNotificationBtn.onclick = () => {
+        elements.notificationModal.style.display = 'none';
+    };
+}
+
 function markChanged() {
     hasChanges = true;
     elements.saveBtn.disabled = false;
@@ -208,11 +255,21 @@ function addWord() {
     }
 
     const existingIndex = wordlist.findIndex(item => item.word === word);
+
     if (existingIndex !== -1) {
-        alert('Word already exists in the list');
+        const currentScore = wordlist[existingIndex].score;
+
+        if (currentScore === score) {
+            // Same word, same score - just show notification
+            showNotification(`The word "${word}" already exists with score ${score}.`);
+        } else {
+            // Same word, different score - show confirmation to update
+            showDuplicateConfirmation(word, currentScore, score, existingIndex);
+        }
         return;
     }
 
+    // New word - add to list
     wordlist.push({ word, score });
     wordlist.sort((a, b) => a.word.localeCompare(b.word));
 

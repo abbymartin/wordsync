@@ -506,6 +506,60 @@ td {
     cursor: not-allowed;
 }
 
+.confirmation-modal,
+.notification-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h3 {
+    color: var(--accent-color-dark);
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.modal-content p {
+    color: var(--main-color);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-actions .btn {
+    min-width: 100px;
+}
+
+.notification-modal .modal-content {
+    text-align: center;
+}
+
+.notification-modal .btn {
+    margin: 0 auto;
+    display: block;
+}
+
 .btn.loading {
     position: relative;
     color: transparent;
