@@ -586,6 +586,29 @@ td {
     }
 }
 
+@media (max-width: 650px) {
+    .pagination-controls {
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .page-indicator {
+        width: 100%;
+        text-align: center;
+        order: 1;
+        margin-top: 10px;
+        padding: 0px 6px;
+    }
+
+    .pagination-controls button {
+        order: 0;
+    }
+
+    #nextPageBtn {
+        margin-left: 15px;
+    }
+}
+
 @media (max-width: 550px) {
     .container {
         max-width: 100%;
@@ -601,11 +624,6 @@ td {
 
     .mode-label {
         font-size: 0.8em;
-    }
-
-    .page-indicator {
-        padding: 0px 6px;
-        font-size: 11px;
     }
 
     .pagination {
