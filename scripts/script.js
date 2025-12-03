@@ -62,6 +62,17 @@ const elements = {
     notificationModal: document.getElementById('notificationModal'),
     notificationMessage: document.getElementById('notificationMessage'),
     closeNotificationBtn: document.getElementById('closeNotificationBtn'),
+    confirmModal: document.getElementById('confirmModal'),
+    confirmTitle: document.getElementById('confirmTitle'),
+    confirmMessage: document.getElementById('confirmMessage'),
+    confirmYesBtn: document.getElementById('confirmYesBtn'),
+    confirmNoBtn: document.getElementById('confirmNoBtn'),
+    inputModal: document.getElementById('inputModal'),
+    inputTitle: document.getElementById('inputTitle'),
+    inputMessage: document.getElementById('inputMessage'),
+    inputField: document.getElementById('inputField'),
+    inputOkBtn: document.getElementById('inputOkBtn'),
+    inputCancelBtn: document.getElementById('inputCancelBtn'),
     filterPanel: document.getElementById('filterPanel'),
     addWordPanel: document.getElementById('addWordPanel')
 };
@@ -122,6 +133,7 @@ function initializeWordlist(words, fileName, source) {
     wordlist = words;
     filteredWordlist = [...wordlist];
     hasChanges = false;
+    elements.saveBtn.disabled = true;  // Explicitly disable on fresh load
     currentFileName = fileName;
     currentPage = 1;
     isSearchActive = false;
@@ -157,7 +169,7 @@ fileInput.addEventListener('change', async (e) => {
 
         initializeWordlist(words, file.name, '(local file)');
     } catch (error) {
-        alert('Error loading file: ' + error.message);
+        showNotification('Error loading file: ' + error.message);
     }
 });
 
@@ -181,7 +193,7 @@ function saveFile() {
 
         hasChanges = false;
         elements.saveBtn.disabled = true;
-        alert('File downloaded! Replace your original wordlist file with the downloaded file.');
+        showNotification('File downloaded! Replace your original wordlist file with the downloaded file.');
     }
 }
 
@@ -240,9 +252,57 @@ function showNotification(message) {
     };
 }
 
+function showConfirm(title, message, onConfirm, onCancel) {
+    elements.confirmTitle.textContent = title;
+    elements.confirmMessage.textContent = message;
+    elements.confirmModal.style.display = 'flex';
+
+    elements.confirmYesBtn.onclick = () => {
+        elements.confirmModal.style.display = 'none';
+        if (onConfirm) onConfirm();
+    };
+
+    elements.confirmNoBtn.onclick = () => {
+        elements.confirmModal.style.display = 'none';
+        if (onCancel) onCancel();
+    };
+}
+
+function showInput(title, message, defaultValue, onSubmit, onCancel) {
+    elements.inputTitle.textContent = title;
+    elements.inputMessage.textContent = message;
+    elements.inputField.value = defaultValue || '';
+    elements.inputModal.style.display = 'flex';
+
+    // Focus the input field
+    setTimeout(() => elements.inputField.focus(), 100);
+
+    const handleSubmit = () => {
+        const value = elements.inputField.value.trim();
+        elements.inputModal.style.display = 'none';
+        if (value && onSubmit) {
+            onSubmit(value);
+        }
+    };
+
+    elements.inputOkBtn.onclick = handleSubmit;
+
+    elements.inputField.onkeypress = (e) => {
+        if (e.key === 'Enter') {
+            handleSubmit();
+        }
+    };
+
+    elements.inputCancelBtn.onclick = () => {
+        elements.inputModal.style.display = 'none';
+        if (onCancel) onCancel();
+    };
+}
+
 function markChanged() {
     hasChanges = true;
-    elements.saveBtn.disabled = false;
+    // Only enable save button if a wordlist is loaded
+    elements.saveBtn.disabled = wordlist.length === 0;
 }
 
 function addWord() {
@@ -250,7 +310,7 @@ function addWord() {
     const score = parseInt(elements.newScore.value) || 50;
 
     if (!word) {
-        alert('Please enter a word');
+        showNotification('Please enter a word');
         return;
     }
 
@@ -283,16 +343,20 @@ function addWord() {
 }
 
 function deleteWord(word) {
-    if (!confirm(`Delete "${word}"?`)) return;
-
-    const index = wordlist.findIndex(item => item.word === word);
-    if (index !== -1) {
-        wordlist.splice(index, 1);
-        markChanged();
-        applyFilter(false);
-        updateStats();
-        updatePagination();
-    }
+    showConfirm(
+        'Delete Word',
+        `Are you sure you want to delete "${word}"?`,
+        () => {
+            const index = wordlist.findIndex(item => item.word === word);
+            if (index !== -1) {
+                wordlist.splice(index, 1);
+                markChanged();
+                applyFilter(false);
+                updateStats();
+                updatePagination();
+            }
+        }
+    );
 }
 
 function updateScore(word, newScore) {
@@ -507,28 +571,32 @@ async function pushToGitHub() {
         return;
     }
 
-    const commitMessage = prompt('Enter commit message:', 'Update wordlist');
-    if (!commitMessage) return;
+    showInput(
+        'Commit Message',
+        'Enter a commit message for this update:',
+        'Update wordlist',
+        async (commitMessage) => {
+            elements.saveBtn.classList.add('loading');
+            elements.saveBtn.disabled = true;
 
-    elements.saveBtn.classList.add('loading');
-    elements.saveBtn.disabled = true;
+            try {
+                const content = wordlist
+                    .map(item => `${item.word};${item.score}`)
+                    .join('\n');
 
-    try {
-        const content = wordlist
-            .map(item => `${item.word};${item.score}`)
-            .join('\n');
+                const api = new GitHubAPI(token, repoOwner, repoName, branch);
+                await api.saveToGitHub(filePath, content, commitMessage);
 
-        const api = new GitHubAPI(token, repoOwner, repoName, branch);
-        await api.saveToGitHub(filePath, content, commitMessage);
-
-        hasChanges = false;
-        showStatus('Successfully pushed to GitHub!');
-    } catch (error) {
-        showStatus(error.message, true);
-    } finally {
-        elements.saveBtn.classList.remove('loading');
-        elements.saveBtn.disabled = !hasChanges;
-    }
+                hasChanges = false;
+                showStatus('Successfully pushed to GitHub!');
+            } catch (error) {
+                showStatus(error.message, true);
+            } finally {
+                elements.saveBtn.classList.remove('loading');
+                elements.saveBtn.disabled = !hasChanges;
+            }
+        }
+    );
 }
 
 function initializeGitHub() {

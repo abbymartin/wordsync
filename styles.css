@@ -529,6 +529,10 @@ td {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+#inputModal .modal-content {
+    max-width: 600px;
+}
+
 .modal-content h3 {
     color: var(--accent-color-dark);
     margin-bottom: 15px;
@@ -558,6 +562,21 @@ td {
 .notification-modal .btn {
     margin: 0 auto;
     display: block;
+}
+
+.modal-input {
+    width: 100% !important;
+    padding: 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
 }
 
 .btn.loading {
