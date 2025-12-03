@@ -393,12 +393,19 @@ th {
 
 td {
     padding: 8px 12px;
+    text-align: left;
     border-bottom: 1px solid #e2e8f0;
 }
 
 .word-cell {
     font-weight: 600;
     color: #2d3748;
+}
+
+.word-length {
+    color: #999;
+    font-weight: 400;
+    font-size: 0.9em;
 }
 
 .score-input {

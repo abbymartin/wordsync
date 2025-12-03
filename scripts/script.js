@@ -431,7 +431,7 @@ function renderTable() {
 
     elements.wordTableBody.innerHTML = itemsToRender.map(item => `
         <tr>
-            <td class="word-cell">${item.word}</td>
+            <td class="word-cell">${item.word} <span class="word-length">(${item.word.length})</span></td>
             <td>
                 <input
                     type="number"
