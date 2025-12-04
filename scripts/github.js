@@ -1,37 +1,38 @@
 const DEFAULT_BRANCH = 'main';
+const API_BASE = '/api/github/proxy';
 
 class GitHubAPI {
-    constructor(token, repoOwner, repoName, branch = DEFAULT_BRANCH) {
-        this.token = token;
+    constructor(repoOwner, repoName, branch = DEFAULT_BRANCH) {
         this.repoOwner = repoOwner;
         this.repoName = repoName;
         this.branch = branch;
-        this.baseUrl = 'https://api.github.com';
     }
 
-    async request(url, options = {}) {
-        const headers = {
-            'Authorization': `token ${this.token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            ...options.headers
-        };
-
-        const response = await fetch(url, {
-            ...options,
-            headers
+    async request(path, options = {}) {
+        const response = await fetch(API_BASE, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                path,
+                method: options.method || 'GET',
+                body: options.body ? JSON.parse(options.body) : undefined
+            })
         });
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({}));
-            throw new Error(error.message || `GitHub API error: ${response.status}`);
+            throw new Error(error.message || error.error || `API error: ${response.status}`);
         }
 
         return response.json();
     }
 
-    async validateToken() {
+    async validateSession() {
         try {
-            await this.request(`${this.baseUrl}/user`);
+            await this.request('/user');
             return true;
         } catch (error) {
             return false;
@@ -41,17 +42,17 @@ class GitHubAPI {
     async loadFromGitHub(filePath) {
         try {
             const refData = await this.request(
-                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/ref/heads/${this.branch}`
+                `/repos/${this.repoOwner}/${this.repoName}/git/ref/heads/${this.branch}`
             );
             const commitSha = refData.object.sha;
 
             const commitData = await this.request(
-                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/commits/${commitSha}`
+                `/repos/${this.repoOwner}/${this.repoName}/git/commits/${commitSha}`
             );
             const treeSha = commitData.tree.sha;
 
             const treeData = await this.request(
-                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/trees/${treeSha}`
+                `/repos/${this.repoOwner}/${this.repoName}/git/trees/${treeSha}`
             );
 
             const fileEntry = treeData.tree.find(entry => entry.path === filePath);
@@ -60,7 +61,7 @@ class GitHubAPI {
             }
 
             const blobData = await this.request(
-                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/blobs/${fileEntry.sha}`
+                `/repos/${this.repoOwner}/${this.repoName}/git/blobs/${fileEntry.sha}`
             );
 
             const content = atob(blobData.content);
@@ -78,17 +79,17 @@ class GitHubAPI {
     async saveToGitHub(filePath, content, commitMessage) {
         try {
             const refData = await this.request(
-                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/ref/heads/${this.branch}`
+                `/repos/${this.repoOwner}/${this.repoName}/git/ref/heads/${this.branch}`
             );
             const currentCommitSha = refData.object.sha;
 
             const commitData = await this.request(
-                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/commits/${currentCommitSha}`
+                `/repos/${this.repoOwner}/${this.repoName}/git/commits/${currentCommitSha}`
             );
             const baseTreeSha = commitData.tree.sha;
 
             const blobResponse = await this.request(
-                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/blobs`,
+                `/repos/${this.repoOwner}/${this.repoName}/git/blobs`,
                 {
                     method: 'POST',
                     body: JSON.stringify({
@@ -100,7 +101,7 @@ class GitHubAPI {
             const newBlobSha = blobResponse.sha;
 
             const treeResponse = await this.request(
-                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/trees`,
+                `/repos/${this.repoOwner}/${this.repoName}/git/trees`,
                 {
                     method: 'POST',
                     body: JSON.stringify({
@@ -117,7 +118,7 @@ class GitHubAPI {
             const newTreeSha = treeResponse.sha;
 
             const newCommitResponse = await this.request(
-                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/commits`,
+                `/repos/${this.repoOwner}/${this.repoName}/git/commits`,
                 {
                     method: 'POST',
                     body: JSON.stringify({
@@ -130,7 +131,7 @@ class GitHubAPI {
             const newCommitSha = newCommitResponse.sha;
 
             await this.request(
-                `${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/git/refs/heads/${this.branch}`,
+                `/repos/${this.repoOwner}/${this.repoName}/git/refs/heads/${this.branch}`,
                 {
                     method: 'PATCH',
                     body: JSON.stringify({
@@ -150,16 +151,35 @@ class GitHubAPI {
     }
 }
 
-function getStoredToken() {
-    return localStorage.getItem('github_token');
+async function checkAuth() {
+    try {
+        const response = await fetch(API_BASE, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                path: '/user',
+                method: 'GET'
+            })
+        });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
 }
 
-function setStoredToken(token) {
-    localStorage.setItem('github_token', token);
-}
-
-function clearStoredToken() {
-    localStorage.removeItem('github_token');
+async function logout() {
+    try {
+        await fetch('/api/auth/logout', {
+            method: 'GET',
+            credentials: 'include'
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
 }
 
 function getStoredFilePath() {

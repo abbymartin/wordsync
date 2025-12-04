@@ -47,13 +47,15 @@ const elements = {
     githubRepoOwner: document.getElementById('githubRepoOwner'),
     githubRepoName: document.getElementById('githubRepoName'),
     githubBranch: document.getElementById('githubBranch'),
-    githubToken: document.getElementById('githubToken'),
-    saveTokenBtn: document.getElementById('saveTokenBtn'),
-    clearTokenBtn: document.getElementById('clearTokenBtn'),
     githubFilePath: document.getElementById('githubFilePath'),
     settingsStatus: document.getElementById('settingsStatus'),
     modeToggle: document.getElementById('modeToggle'),
     githubSettingsBtn: document.getElementById('githubSettingsBtn'),
+    githubLoginBtn: document.getElementById('githubLoginBtn'),
+    githubLogoutBtn: document.getElementById('githubLogoutBtn'),
+    loginInfo: document.getElementById('loginInfo'),
+    loggedInInfo: document.getElementById('loggedInInfo'),
+    saveSettingsBtn: document.getElementById('saveSettingsBtn'),
     filterToggleBtn: document.getElementById('filterToggleBtn'),
     addToggleBtn: document.getElementById('addToggleBtn'),
     duplicateModal: document.getElementById('duplicateModal'),
@@ -477,62 +479,60 @@ function showStatus(message, isError = false) {
     elements.settingsStatus.style.display = 'block';
 }
 
-async function saveToken() {
-    const token = elements.githubToken.value.trim();
+async function saveSettings() {
     const repoOwner = elements.githubRepoOwner.value.trim();
     const repoName = elements.githubRepoName.value.trim();
     const filePath = elements.githubFilePath.value.trim();
     const branch = elements.githubBranch.value.trim() || 'main';
-
-    if (!token) {
-        showStatus('Please enter a GitHub token', true);
-        return;
-    }
 
     if (!repoOwner || !repoName) {
         showStatus('Please enter repository owner and name', true);
         return;
     }
 
-    const api = new GitHubAPI(token, repoOwner, repoName, branch);
-    const isValid = await api.validateToken();
-
-    if (!isValid) {
-        showStatus('Invalid token. Please check your token and try again.', true);
-        return;
-    }
-
-    setStoredToken(token);
     setStoredRepoOwner(repoOwner);
     setStoredRepoName(repoName);
     setStoredFilePath(filePath);
     setStoredBranch(branch);
-    showStatus('Configuration saved successfully!');
+    showStatus('Settings saved successfully!');
 }
 
-function clearToken() {
-    clearStoredToken();
-    localStorage.removeItem('github_repo_owner');
-    localStorage.removeItem('github_repo_name');
-    localStorage.removeItem('github_file_path');
-    localStorage.removeItem('github_branch');
-    elements.githubToken.value = '';
-    elements.githubRepoOwner.value = '';
-    elements.githubRepoName.value = '';
-    elements.githubFilePath.value = 'wordlist.dict';
-    elements.githubBranch.value = 'main';
-    showStatus('All configuration cleared');
+async function handleLogin() {
+    window.location.href = '/api/auth/login';
+}
+
+async function handleLogout() {
+    const success = await logout();
+    if (success) {
+        updateAuthUI(false);
+        showStatus('Logged out successfully');
+    }
+}
+
+function updateAuthUI(isAuthenticated) {
+    if (isAuthenticated) {
+        elements.loginInfo.style.display = 'none';
+        elements.loggedInInfo.style.display = 'block';
+    } else {
+        elements.loginInfo.style.display = 'block';
+        elements.loggedInInfo.style.display = 'none';
+    }
 }
 
 async function loadFromGitHub() {
-    const token = getStoredToken();
+    const isAuthenticated = await checkAuth();
+    if (!isAuthenticated) {
+        showStatus('Please login with GitHub first', true);
+        return;
+    }
+
     const repoOwner = getStoredRepoOwner();
     const repoName = getStoredRepoName();
     const filePath = getStoredFilePath();
     const branch = getStoredBranch();
 
-    if (!token || !repoOwner || !repoName) {
-        showStatus('Please save your GitHub configuration first', true);
+    if (!repoOwner || !repoName) {
+        showStatus('Please save your GitHub settings first', true);
         return;
     }
 
@@ -540,7 +540,7 @@ async function loadFromGitHub() {
     elements.loadBtn.disabled = true;
 
     try {
-        const api = new GitHubAPI(token, repoOwner, repoName, branch);
+        const api = new GitHubAPI(repoOwner, repoName, branch);
         const result = await api.loadFromGitHub(filePath);
 
         const words = result.content.trim().split('\n').map(line => {
@@ -562,14 +562,19 @@ async function loadFromGitHub() {
 }
 
 async function pushToGitHub() {
-    const token = getStoredToken();
+    const isAuthenticated = await checkAuth();
+    if (!isAuthenticated) {
+        showStatus('Please login with GitHub first', true);
+        return;
+    }
+
     const repoOwner = getStoredRepoOwner();
     const repoName = getStoredRepoName();
     const filePath = getStoredFilePath();
     const branch = getStoredBranch();
 
-    if (!token || !repoOwner || !repoName) {
-        showStatus('Please save your GitHub configuration first', true);
+    if (!repoOwner || !repoName) {
+        showStatus('Please save your GitHub settings first', true);
         return;
     }
 
@@ -586,7 +591,7 @@ async function pushToGitHub() {
                     .map(item => `${item.word};${item.score}`)
                     .join('\n');
 
-                const api = new GitHubAPI(token, repoOwner, repoName, branch);
+                const api = new GitHubAPI(repoOwner, repoName, branch);
                 await api.saveToGitHub(filePath, content, commitMessage);
 
                 hasChanges = false;
@@ -601,16 +606,11 @@ async function pushToGitHub() {
     );
 }
 
-function initializeGitHub() {
-    const token = getStoredToken();
+async function initializeGitHub() {
     const repoOwner = getStoredRepoOwner();
     const repoName = getStoredRepoName();
     const filePath = getStoredFilePath();
     const branch = getStoredBranch();
-
-    if (token) {
-        elements.githubToken.value = token;
-    }
 
     if (repoOwner) {
         elements.githubRepoOwner.value = repoOwner;
@@ -627,6 +627,10 @@ function initializeGitHub() {
     if (branch) {
         elements.githubBranch.value = branch;
     }
+
+    // Check if user is authenticated
+    const isAuthenticated = await checkAuth();
+    updateAuthUI(isAuthenticated);
 }
 
 function updatePagination() {
@@ -685,8 +689,9 @@ elements.githubSettingsBtn.addEventListener('click', toggleSettings);
 elements.filterToggleBtn.addEventListener('click', toggleFilterPanel);
 elements.addToggleBtn.addEventListener('click', toggleAddWordPanel);
 
-elements.saveTokenBtn.addEventListener('click', saveToken);
-elements.clearTokenBtn.addEventListener('click', clearToken);
+elements.saveSettingsBtn.addEventListener('click', saveSettings);
+elements.githubLoginBtn.addEventListener('click', handleLogin);
+elements.githubLogoutBtn.addEventListener('click', handleLogout);
 
 elements.newWord.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') addWord();

@@ -39,8 +39,13 @@
 
         <!-- GitHub settings panel -->
         <div class="settings-panel" id="settingsPanel" style="display: none;">
-            <div class="settings-info">
-                <p>Configure GitHub integration. You'll need a <a href="https://github.com/settings/personal-access-tokens" target="_blank">Personal Access Token</a> with <strong>Contents</strong> read and write access for your repository. Token and other info are stored locally and only accessible to you.</p>
+            <div class="settings-info" id="loginInfo">
+                <p>Sign in with GitHub to sync your wordlist. This will give WordSync access to read and write to your repositories.</p>
+                <button class="btn btn-primary" id="githubLoginBtn">Login with GitHub</button>
+            </div>
+            <div class="settings-info" id="loggedInInfo" style="display: none;">
+                <p>You are logged in with GitHub.</p>
+                <button class="btn btn-danger" id="githubLogoutBtn">Logout</button>
             </div>
             <div class="settings-row">
                 <label for="githubRepoOwner">Repository Owner:</label>
@@ -59,12 +64,7 @@
                 <input type="text" id="githubBranch" placeholder="main" value="main">
             </div>
             <div class="settings-row">
-                <label for="githubToken">GitHub Token:</label>
-                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
-            </div>
-            <div class="settings-row">
-                <button class="btn btn-primary" id="saveTokenBtn">Save Configuration</button>
-                <button class="btn btn-danger" id="clearTokenBtn">Clear All</button>
+                <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
             </div>
             <div class="settings-status" id="settingsStatus"></div>
         </div>
