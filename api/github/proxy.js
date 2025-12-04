@@ -69,6 +69,18 @@ async function getInstallationAccessToken(installationId) {
 }
 
 export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'https://wordsync.abbymartin.net');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Cookie');
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   // Get token from cookie
   const cookies = req.headers.cookie?.split(';').reduce((acc, cookie) => {
     const [key, value] = cookie.trim().split('=');
