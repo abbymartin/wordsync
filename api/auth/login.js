@@ -1,8 +1,9 @@
 export default function handler(req, res) {
-  const clientId = process.env.GITHUB_CLIENT_ID;
-  const redirectUri = `${process.env.FRONTEND_URL}/api/auth/callback`;
+  const appName = process.env.GITHUB_APP_NAME || 'wordsync';
 
-  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
+  // Redirect to GitHub App installation page
+  // User can select which repositories to grant access to
+  const githubAppInstallUrl = `https://github.com/apps/${appName}/installations/new`;
 
-  res.redirect(302, githubAuthUrl);
+  res.redirect(302, githubAppInstallUrl);
 }
