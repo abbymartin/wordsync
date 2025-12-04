@@ -160,7 +160,7 @@ async function checkAuth() {
             },
             credentials: 'include',
             body: JSON.stringify({
-                path: '/user',
+                path: '/installation/repositories',
                 method: 'GET'
             })
         });
