@@ -1,13 +1,7 @@
 {
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 10,
-      "memory": 1024
-    }
-  },
-  "api": {
-    "bodyParser": {
-      "sizeLimit": "10mb"
+      "maxDuration": 10
     }
   },
   "headers": [
