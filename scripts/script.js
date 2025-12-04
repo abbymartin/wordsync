@@ -3,6 +3,7 @@ let filteredWordlist = [];
 let currentFileName = 'wordlist.dict';
 let hasChanges = false;
 let sortDirection = { word: 1, score: 1 };
+let currentSort = "word";
 let currentPage = 1;
 let itemsPerPage = 100;
 let isSearchActive = false;
@@ -235,7 +236,7 @@ function showDuplicateConfirmation(word, currentScore, newScore, existingIndex) 
         markChanged();
         applyFilter(false);
         updateStats();
-        updatePagination();
+        sortTable(currentSort, false);
     };
 
     elements.cancelDuplicateBtn.onclick = () => {
@@ -320,16 +321,14 @@ function addWord() {
         const currentScore = wordlist[existingIndex].score;
 
         if (currentScore === score) {
-            // Same word, same score - just show notification
             showNotification(`The word "${word}" already exists with score ${score}.`);
         } else {
-            // Same word, different score - show confirmation to update
+            // option to update with new score or cancel
             showDuplicateConfirmation(word, currentScore, score, existingIndex);
         }
         return;
     }
 
-    // New word - add to list
     wordlist.push({ word, score });
     wordlist.sort((a, b) => a.word.localeCompare(b.word));
 
@@ -339,7 +338,7 @@ function addWord() {
     markChanged();
     applyFilter(false);
     updateStats();
-    updatePagination();
+    sortTable(currentSort, false);
 }
 
 function deleteWord(word) {
@@ -353,7 +352,7 @@ function deleteWord(word) {
                 markChanged();
                 applyFilter(false);
                 updateStats();
-                updatePagination();
+                sortTable(currentSort, false);
             }
         }
     );
@@ -400,8 +399,11 @@ function debouncedSearch() {
     }, SEARCH_DEBOUNCE_MS);
 }
 
-function sortTable(column) {
-    sortDirection[column] *= -1;
+function sortTable(column, change) {
+    if (change) {
+        sortDirection[column] *= -1;
+    }
+    currentSort = column;
 
     filteredWordlist.sort((a, b) => {
         if (column === 'word') {
@@ -692,7 +694,7 @@ elements.newWord.addEventListener('keypress', (e) => {
 
 document.querySelectorAll('.sort-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-        sortTable(e.target.dataset.sort);
+        sortTable(e.target.dataset.sort, true);
     });
 });
 
