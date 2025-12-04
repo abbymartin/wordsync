@@ -1,30 +1,60 @@
 const DEFAULT_BRANCH = 'main';
 const API_BASE = '/api/github/proxy';
+const TOKEN_ENDPOINT = '/api/github/get-token';
 
 class GitHubAPI {
     constructor(repoOwner, repoName, branch = DEFAULT_BRANCH) {
         this.repoOwner = repoOwner;
         this.repoName = repoName;
         this.branch = branch;
+        this.cachedToken = null;
+        this.tokenExpiry = null;
+    }
+
+    async getToken() {
+        // Return cached token if still valid
+        if (this.cachedToken && this.tokenExpiry && Date.now() < this.tokenExpiry) {
+            return this.cachedToken;
+        }
+
+        // Get new token
+        const response = await fetch(TOKEN_ENDPOINT, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to get access token');
+        }
+
+        const data = await response.json();
+        this.cachedToken = data.token;
+        this.tokenExpiry = Date.now() + (data.expiresIn * 1000) - 60000; // Expire 1 min early
+
+        return this.cachedToken;
     }
 
     async request(path, options = {}) {
-        const response = await fetch(API_BASE, {
-            method: 'POST',
+        const token = await this.getToken();
+
+        // Make request directly to GitHub API
+        const response = await fetch(`https://api.github.com${path}`, {
+            method: options.method || 'GET',
             headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
                 'Content-Type': 'application/json',
+                ...options.headers
             },
-            credentials: 'include',
-            body: JSON.stringify({
-                path,
-                method: options.method || 'GET',
-                body: options.body ? JSON.parse(options.body) : undefined
-            })
+            body: options.body
         });
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({}));
-            throw new Error(error.message || error.error || `API error: ${response.status}`);
+            throw new Error(error.message || `GitHub API error: ${response.status}`);
         }
 
         return response.json();
