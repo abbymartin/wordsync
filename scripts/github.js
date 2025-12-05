@@ -1,5 +1,4 @@
 const DEFAULT_BRANCH = 'main';
-const API_BASE = '/api/github/proxy';
 const TOKEN_ENDPOINT = '/api/github/get-token';
 
 class GitHubAPI {
@@ -183,16 +182,12 @@ class GitHubAPI {
 
 async function checkAuth() {
     try {
-        const response = await fetch(API_BASE, {
+        const response = await fetch(TOKEN_ENDPOINT, {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                path: '/installation/repositories',
-                method: 'GET'
-            })
+            }
         });
         return response.ok;
     } catch (error) {
