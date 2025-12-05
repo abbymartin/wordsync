@@ -317,7 +317,7 @@ function addWord() {
         return;
     }
 
-    const existingIndex = wordlist.findIndex(item => item.word === word);
+    const existingIndex = wordlist.findIndex(item => item.word.toUpperCase() === word.toUpperCase());
 
     if (existingIndex !== -1) {
         const currentScore = wordlist[existingIndex].score;
