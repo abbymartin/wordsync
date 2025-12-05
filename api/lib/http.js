@@ -1,4 +1,4 @@
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://wordsync.abbymartin.net';
+export const FRONTEND_URL = process.env.FRONTEND_URL || 'https://wordsync.abbymartin.net';
 
 export function setCorsHeaders(res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -23,10 +23,10 @@ export function parseCookies(req) {
   }, {}) || {};
 }
 
-export function setAuthCookie(res, token) {
-  res.setHeader('Set-Cookie', `auth_token=${token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${60 * 60 * 24 * 30}`);
+export function setCookie(res, name, value, maxAge) {
+  res.setHeader('Set-Cookie', `${name}=${value}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${maxAge}`);
 }
 
-export function clearAuthCookie(res) {
-  res.setHeader('Set-Cookie', 'auth_token=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0');
+export function clearCookie(res, name) {
+  res.setHeader('Set-Cookie', `${name}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`);
 }

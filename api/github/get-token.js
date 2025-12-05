@@ -7,25 +7,20 @@ export default async function handler(req, res) {
   if (handlePreflight(req, res)) return;
 
   const cookies = parseCookies(req);
-  const token = cookies.auth_token;
 
-  if (!token) {
+  if (!cookies.auth_token) {
     return res.status(401).json({ error: 'Not authenticated' });
   }
 
-  const payload = verifySessionJWT(token);
+  const payload = verifySessionJWT(cookies.auth_token);
 
-  if (!payload || !payload.installationId) {
+  if (!payload?.installationId) {
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 
   try {
-    const installationToken = await getInstallationAccessToken(payload.installationId);
-
-    res.status(200).json({
-      token: installationToken,
-      expiresIn: 3600
-    });
+    const token = await getInstallationAccessToken(payload.installationId);
+    res.status(200).json({ token, expiresIn: 3600 });
   } catch (error) {
     console.error('Failed to get installation token:', error);
     res.status(500).json({ error: 'Failed to get access token' });
