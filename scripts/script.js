@@ -309,7 +309,7 @@ function markChanged() {
 }
 
 function addWord() {
-    const word = elements.newWord.value.trim().toUpperCase();
+    const word = elements.newWord.value.trim();
     const score = parseInt(elements.newScore.value) || 50;
 
     if (!word) {
@@ -379,7 +379,7 @@ function applyFilter(resetPage) {
                      minScr > 0 || maxScr < Infinity;
 
     filteredWordlist = wordlist.filter(item => {
-        const matchesSearch = item.word.includes(searchTerm);
+        const matchesSearch = item.word.toUpperCase().includes(searchTerm);
         const matchesLength = item.word.length >= minLen && item.word.length <= maxLen;
         const matchesScore = item.score >= minScr && item.score <= maxScr;
 
